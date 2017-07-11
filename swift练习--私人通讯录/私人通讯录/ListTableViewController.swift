@@ -10,7 +10,7 @@ import UIKit
 
 class ListTableViewController: UITableViewController {
 
-    var dataSource = [Person]()
+    private lazy var dataSource = [Person]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +21,7 @@ class ListTableViewController: UITableViewController {
             self.tableView.reloadData()
         }
     }
-
+    //MARK: dataSource
     private func postData(success:@escaping ([Person]) -> ()){
         DispatchQueue.global().async {
             Thread.sleep(forTimeInterval: 1.0)
@@ -43,6 +43,7 @@ class ListTableViewController: UITableViewController {
             })
         }
     }
+    //MARK: tableviewdataSourcedelegate
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataSource.count
     }
@@ -61,6 +62,7 @@ class ListTableViewController: UITableViewController {
         performSegue(withIdentifier: "goident", sender: indexPath)
         
     }
+    //MARK: button 点击事件
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let vc = segue.destination as!AddPersonTableViewController
         
@@ -74,14 +76,16 @@ class ListTableViewController: UITableViewController {
                 self.tableView.reloadRows(at: [index], with: .automatic)
             }
         }else{
-            //添加新的
-            
-            guard let p = vc.person  else { return  }
-            
-            self.dataSource.insert(p, at: 0)
-            
-            self.tableView.reloadData()
-            
+            //添加新的 执行回调
+            vc.block = {
+                
+                //若什么也没有输入 不进行页面刷新
+                guard let p = vc.person  else { return  }
+                
+                self.dataSource.insert(p , at: 0)
+                
+                self.tableView.reloadData()
+            }
             
         }
         
